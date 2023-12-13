@@ -1,0 +1,36 @@
+name: Build and Push Quarkus Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    - name: Build Quarkus application
+      run: mvn package -Pnative -Dquarkus.native.container-build=true
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and push Docker image to GitHub Packages
+      env:
+        GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+        GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      run: |
+        docker buildx create --use
+        docker buildx build --platform linux/amd64 -t ghcr.io/${{ github.repository }}/quarkus-app:latest .
+        echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
+        docker push ghcr.io/${{ github.repository }}/quarkus-app:latest
