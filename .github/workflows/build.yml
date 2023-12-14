@@ -30,6 +30,7 @@ jobs:
         GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
         GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       run: |
+        docker -v
         docker buildx create --use
         docker buildx build --platform linux/amd64 -t ghcr.io/${{ github.repository }}/quarkus-app:latest .
         echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
