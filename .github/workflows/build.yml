@@ -32,7 +32,7 @@ jobs:
       run: |
         docker -v
         docker buildx create --use
-        docker buildx build --platform linux/amd64 -t ghcr.io/${{ github.repository }}/quarkus-app:latest .
+        docker buildx build --platform linux/amd64 -f src/main/docker/Dockerfile.jvm -t ghcr.io/${{ github.repository }}/quarkus-app:latest .
         docker images 
         echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
         docker push ghcr.io/${{ github.repository }}/quarkus-app:latest
